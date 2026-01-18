@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:16-pg16
+    container_name: project_x_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=project_x
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: project_x_backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/project_x
+      - SECRET_KEY=super-insecure-secret-key-change-this
+      - ALGORITHM=HS256
+      - PILOT_MODE=True
+      - PILOT_INVITE_CODE=ProjectX2025
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

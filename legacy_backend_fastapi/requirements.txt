@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+python-jose
+passlib[bcrypt]
+pytest
+pytest-asyncio
+httpx
+pydantic-settings
+pgvector
+numpy
+sentence-transformers

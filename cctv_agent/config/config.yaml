@@ -1,0 +1,7 @@
+cameras:
+  - id: "cam_01"
+    district_id: "district_A"
+    source: "sample.mp4" # Looks in data/samples/ by default logic in main.py
+  - id: "cam_02"
+    district_id: "district_B_Hotspot"
+    source: "sample.mp4"

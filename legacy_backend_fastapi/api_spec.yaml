@@ -1,0 +1,90 @@
+openapi: 3.0.0
+info:
+  title: Project X API
+  version: 1.0.0
+  description: Government-aligned Pilot Security System API
+paths:
+  /health:
+    get:
+      summary: System Health Check
+      responses:
+        '200':
+          description: OK
+
+  /auth/login:
+    post:
+      summary: Login (Invite tokens only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invite_token:
+                  type: string
+      responses:
+        '200':
+          description: Session Token
+
+  /analytics/district/{district_id}:
+    get:
+      summary: Get aggregate analytics for a district
+      parameters:
+        - name: district_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Aggregate stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistrictStats'
+
+  /chat/message:
+    post:
+      summary: Send message to Buddy Chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                context_district:
+                  type: string
+      responses:
+        '200':
+          description: AI Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+
+components:
+  schemas:
+    DistrictStats:
+      type: object
+      properties:
+        district_id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        crowd_density_index:
+          type: integer
+          description: 0-100 scale
+        vehicle_flow_per_min:
+          type: integer
+    ChatResponse:
+      type: object
+      properties:
+        response_text:
+          type: string
+        safety_flag:
+          type: boolean
