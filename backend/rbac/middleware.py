@@ -15,7 +15,10 @@ class RbacEnforcementMiddleware:
         # Protect Django Admin
         if path.startswith('/admin/'):
             if not request.user.is_authenticated:
-                 # Let standard login handle it, or force 404/403
+                 # Let standard login handle it
+                 pass
+            elif request.user.is_superuser:
+                 # Superusers always allowed
                  pass
             elif request.user.role not in ['ADMIN', 'SUPER_ADMIN']:
                  return JsonResponse(

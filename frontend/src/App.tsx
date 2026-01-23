@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Suspense, lazy } from 'react';
 import BottomNav from './components/layout/BottomNav';
@@ -13,7 +13,11 @@ const Settings = lazy(() => import('./pages/Traveler/Settings'));
 const HotspotDetail = lazy(() => import('./pages/Hotspot/Detail'));
 const Chat = lazy(() => import('./pages/BuddyChat/Chat'));
 const HostDashboard = lazy(() => import('./pages/Host/Dashboard'));
+const CreateHotspot = lazy(() => import('./pages/Host/CreateHotspot'));
 const AdminDashboard = lazy(() => import('./pages/Admin/Dashboard'));
+const CommerceDemo = lazy(() => import('./pages/Commerce/Demo'));
+
+const Authenticator = lazy(() => import('./pages/Mobile/Authenticator'));
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, roles }: { children: React.ReactNode, roles?: string[] }) => {
@@ -28,14 +32,17 @@ const ProtectedRoute = ({ children, roles }: { children: React.ReactNode, roles?
   return <>{children}</>;
 };
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const KioskApp = lazy(() => import('./pages/Kiosk'));
+
+const MainLayout = () => {
   const { user } = useAuth();
   const location = useLocation();
-  const showBottomNav = user?.role === 'TRAVELER' && !['/login', '/signup', '/', '/landing'].includes(location.pathname) && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/host');
+  // Don't show bottom nav on kiosk route, auth pages, or admin/host sections
+  const showBottomNav = user?.role === 'TRAVELER' && !['/login', '/signup', '/', '/landing', '/kiosk'].includes(location.pathname) && !location.pathname.startsWith('/admin') && !location.pathname.startsWith('/host');
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
-      {children}
+      <Outlet />
       {showBottomNav && <BottomNav />}
     </div>
   );
@@ -45,9 +52,11 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Layout>
-          <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-            <Routes>
+        <Suspense fallback={<div className="flex items-center justify-center h-screen text-white">Loading...</div>}>
+          <Routes>
+            <Route path="/kiosk/*" element={<KioskApp />} />
+
+            <Route element={<MainLayout />}>
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -58,11 +67,11 @@ function App() {
                   <TravelerHome />
                 </ProtectedRoute>
               } />
-              <Route path="/hotspot/:id" element={
-                <ProtectedRoute roles={['TRAVELER']}>
-                  <HotspotDetail />
-                </ProtectedRoute>
-              } />
+
+              {/* Public Discovery */}
+              <Route path="/hotspot/:id" element={<HotspotDetail />} />
+              <Route path="/commerce/demo" element={<CommerceDemo />} />
+
               <Route path="/chat" element={
                 <ProtectedRoute roles={['TRAVELER']}>
                   <Chat />
@@ -79,10 +88,26 @@ function App() {
                 </ProtectedRoute>
               } />
 
+              <Route path="/authenticator" element={
+                <ProtectedRoute roles={['TRAVELER']}>
+                  <Authenticator />
+                </ProtectedRoute>
+              } />
+
               {/* Host Routes */}
-              <Route path="/host/*" element={
+              <Route path="/host" element={
                 <ProtectedRoute roles={['HOST']}>
                   <HostDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/host/create" element={
+                <ProtectedRoute roles={['HOST']}>
+                  <CreateHotspot />
+                </ProtectedRoute>
+              } />
+              <Route path="/host/edit/:id" element={
+                <ProtectedRoute roles={['HOST']}>
+                  <CreateHotspot />
                 </ProtectedRoute>
               } />
 
@@ -93,9 +118,11 @@ function App() {
                 </ProtectedRoute>
               } />
 
-            </Routes>
-          </Suspense>
-        </Layout>
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+        </Suspense>
       </Router>
     </AuthProvider>
   );

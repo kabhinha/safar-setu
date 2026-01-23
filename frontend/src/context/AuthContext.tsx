@@ -4,6 +4,7 @@ import api from '../services/api';
 
 interface AuthState {
     user: User | null;
+    token: string | null; // Added
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (creds: any) => Promise<void>;
@@ -16,12 +17,14 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         // Check for existing token
-        const token = localStorage.getItem('token');
-        if (token) {
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+            setToken(storedToken);
             // In a real app, we would validate token and fetch user profile here
             // For now, we'll try to retrieve stored user or just generic persistence
             const storedUser = localStorage.getItem('user');
@@ -34,14 +37,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = async (creds: any) => {
         try {
-            // 1. Get Token
-            // Adapting to backend expectation: "username" instead of "email" if needed, 
-            // but usually TokenObtainPairView uses username field. 
-            // If User model uses email as username, or we send email as username.
-            // Let's assume standardized payload { username: creds.email, password: creds.password }
-            // or just pass as is if backend handles email.
-            // Standard DRF TokenObtainPairView expects 'username' key by default unless customized.
-
+            // ... (keep logic)
+            // But ensure we setToken state
             const payload = {
                 email: creds.email,
                 password: creds.password
@@ -54,13 +51,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             localStorage.setItem('token', access);
             localStorage.setItem('refresh', refresh);
+            setToken(access); // Update state
 
             // 2. Fetch User Profile
             const profileRes = await api.get('/users/me/');
             const userProfile = profileRes.data;
-
-            // Ensure role matches (optional security check)
-            // if (userProfile.role !== role) ...
 
             localStorage.setItem('user', JSON.stringify(userProfile));
             setUser(userProfile);
@@ -71,7 +66,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const register = async (data: any) => {
-        // API call to register
         await api.post('/auth/signup/', data);
     };
 
@@ -91,10 +85,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('user');
         localStorage.removeItem('refresh');
         setUser(null);
+        setToken(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, register, logout, refreshProfile }}>
+        <AuthContext.Provider value={{ user, token, isAuthenticated: !!user, isLoading, login, register, logout, refreshProfile }}>
             {children}
         </AuthContext.Provider>
     );

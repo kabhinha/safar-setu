@@ -1,10 +1,13 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import CommerceViewSet
-
-router = DefaultRouter()
-router.register(r'qrcodes', CommerceViewSet, basename='qrcode')
+from django.urls import path
+from .views import (
+    CommerceInitiateView, CommerceScanView, 
+    CommerceVendorTokenView, CommerceStatusView, CommerceProductListView
+)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('products/', CommerceProductListView.as_view(), name='product-list'),
+    path('deals/initiate/', CommerceInitiateView.as_view(), name='deal-initiate'),
+    path('deals/<uuid:deal_id>/status/', CommerceStatusView.as_view(), name='deal-status'),
+    path('deals/<uuid:deal_id>/vendor-token/', CommerceVendorTokenView.as_view(), name='vendor-token'),
+    path('scan/', CommerceScanView.as_view(), name='scan-token'),
 ]

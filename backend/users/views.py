@@ -54,6 +54,40 @@ class VerifyOTPView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class VerifyInviteView(APIView):
+    """
+    Public Endpoint: Create/Activate User via Valid Invite Code.
+    Enforces E04: Engagement Invite event.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        invite_code = request.data.get('invite_code')
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        # 1. Validate Invite Code (Hardcoded for Pilot)
+        # In a real system, this would check an InviteCode model
+        VALID_CODES = ['SAFE-PILOT-2026', 'ADMIN-OVERRIDE', 'GOVT-TEST']
+        
+        if invite_code not in VALID_CODES:
+             return Response({"message": "Invalid Government Invite Code."}, status=status.HTTP_403_FORBIDDEN)
+
+        # 2. Check if user already exists
+        if User.objects.filter(email=email).exists():
+             return Response({"message": "Identity already registered. Please login."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 3. Create User (Engaged ID)
+        user = User.objects.create(
+            username=email.split('@')[0], # Generate username handles
+            email=email,
+            is_active=True # Auto-active since invite is trusted
+        )
+        user.set_password(password)
+        user.save()
+
+        return Response({"message": "Identity initialized. Welcome to the pilot."}, status=status.HTTP_201_CREATED)
+
 class MeView(generics.RetrieveUpdateAPIView):
     """
     Protected: Get Current User
@@ -63,3 +97,33 @@ class MeView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+class GenerateConnectCodeView(APIView):
+    """
+    Authenticated Mobile User requests a 6-digit code for Kiosk.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        from .models import ConnectCode
+        from django.utils import timezone
+        import datetime
+
+        # Generate unique 6-digit code
+        while True:
+            code = str(random.randint(100000, 999999))
+            if not ConnectCode.objects.filter(code=code, is_used=False, expires_at__gt=timezone.now()).exists():
+                break
+        
+        # Save Code (Valid for 2 Minutes)
+        ConnectCode.objects.create(
+            user=request.user,
+            code=code,
+            expires_at=timezone.now() + datetime.timedelta(minutes=2)
+        )
+
+        return Response({
+            "code": code,
+            "expires_in_seconds": 120,
+            "formatted_code": f"{code[:3]}-{code[3:]}"
+        }, status=status.HTTP_201_CREATED)

@@ -9,4 +9,16 @@ urlpatterns = [
     path('api/v1/commerce/', include('commerce.urls')),
     path('api/v1/features/', include('features.urls')),
     path('api/v1/kiosk/', include('kiosk.urls')),
+    path('api/', include('reco.urls')), # Recommendation Engine (Exposed at /api/public/...)
 ]
+
+# Admin Branding
+admin.site.site_header = "SafarSetu Administration"
+admin.site.site_title = "SafarSetu Admin"
+admin.site.index_title = "System Management"
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

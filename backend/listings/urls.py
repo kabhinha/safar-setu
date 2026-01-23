@@ -1,9 +1,20 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import HotspotViewSet
+from .views import (
+    HotspotPublicViewSet, HotspotHostViewSet, 
+    HotspotModeratorViewSet, ModerationTicketViewSet
+)
 
 router = DefaultRouter()
-router.register(r'hotspots', HotspotViewSet, basename='hotspot')
+# Public Route (Discovery)
+router.register(r'hotspots', HotspotPublicViewSet, basename='public-hotspot')
+
+# Host Routes
+router.register(r'host/hotspots', HotspotHostViewSet, basename='host-hotspot')
+
+# Moderator Routes
+router.register(r'mod/hotspots', HotspotModeratorViewSet, basename='mod-hotspot')
+router.register(r'mod/tickets', ModerationTicketViewSet, basename='mod-ticket')
 
 urlpatterns = [
     path('', include(router.urls)),

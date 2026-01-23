@@ -19,7 +19,7 @@ const Login = () => {
     const onSubmit = async (data: any) => {
         try {
             await login(data);
-            navigate(role === 'host' ? '/host/dashboard' : '/feed');
+            navigate(role === 'host' ? '/host' : '/feed');
         } catch (err) {
             setError('Invalid credentials');
         }
