@@ -21,6 +21,17 @@ class User(AbstractUser):
     
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     verification_code = models.CharField(max_length=6, blank=True, null=True, help_text="6-digit OTP for email verification")
+
+    # Tourist registration fields
+    NATIONALITY_CHOICES = (
+        ('INDIAN', 'Indian National'),
+        ('FOREIGN', 'Foreign National'),
+    )
+    nationality = models.CharField(max_length=20, choices=NATIONALITY_CHOICES, default='INDIAN')
+    country = models.CharField(max_length=100, blank=True, null=True)
+    identity_type = models.CharField(max_length=50, blank=True, null=True)
+    identity_value = models.CharField(max_length=120, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
     
     email = models.EmailField(unique=True)
 

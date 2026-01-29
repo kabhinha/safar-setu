@@ -1,41 +1,43 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Menu } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import safarsetuLogo from "@/assets/safarsetu_logo.png";
+
 
 interface GovtNavbarProps {
     showUserBadge?: boolean;
 }
 
 const GovtNavbar: React.FC<GovtNavbarProps> = ({ showUserBadge = true }) => {
-    const { user } = useAuth();
+    const { user, isAuthenticated } = useAuth();
 
     return (
         <header className="bg-white border-b border-slate-200 sticky top-0 z-40 h-16 flex items-center justify-between px-4 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
             <div className="flex items-center gap-3">
                 {/* Official Seal of Sikkim */}
                 <img
-                    src="../assets/safarsetu_logo.png"
+                    src={safarsetuLogo}
                     alt="Government of Sikkim"
                     className="h-10 w-10 object-contain drop-shadow-sm"
                 />
 
                 <div className="flex flex-col justify-center">
-                    <span className="text-[10px] font-serif font-bold text-slate-500 uppercase tracking-widest leading-tight">
+                    <Link to="/m" className="text-[10px] font-serif font-bold text-slate-500 uppercase tracking-widest leading-tight">
                         Government of Sikkim
-                    </span>
-                    <span className="text-base font-bold text-slate-900 tracking-tight leading-none font-sans">
+                    </Link>
+                    <Link to="/m" className="text-base font-bold text-slate-900 tracking-tight leading-none font-sans">
                         SAFARSETU
-                    </span>
+                    </Link>
                 </div>
             </div>
 
             <div className="flex items-center gap-4">
-                {/* G20 / India75 Placeholder (Textual for now to keep it clean) */}
                 <div className="hidden sm:flex flex-col items-end opacity-50">
                     <span className="text-[8px] font-bold uppercase tracking-wider">Incredible India</span>
                 </div>
 
-                {showUserBadge ? (
+                {isAuthenticated && showUserBadge && (
                     <div className="flex items-center gap-2 pl-4 border-l border-slate-100">
                         <div className="flex flex-col items-end">
                             <span className="text-[11px] font-bold text-slate-900 leading-none">{user?.first_name || 'Citizen'}</span>
@@ -44,7 +46,20 @@ const GovtNavbar: React.FC<GovtNavbarProps> = ({ showUserBadge = true }) => {
                             </span>
                         </div>
                     </div>
-                ) : (
+                )}
+
+                {!isAuthenticated && (
+                    <div className="flex items-center gap-2">
+                        <Link to="/m/login" className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:text-slate-900">
+                            Login
+                        </Link>
+                        <Link to="/m/signup" className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.08)] hover:bg-slate-800">
+                            Sign Up
+                        </Link>
+                    </div>
+                )}
+
+                {isAuthenticated && !showUserBadge && (
                     <button className="p-2 text-slate-400 hover:text-slate-600">
                         <Menu className="h-5 w-5" />
                     </button>

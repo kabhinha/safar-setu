@@ -1,9 +1,26 @@
 import { useParams } from 'react-router-dom';
 import { ShoppingBag } from 'lucide-react';
 import React from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useMobileToken } from './hooks/useMobileToken';
 
 const MobileDealReceipt: React.FC = () => {
-    const { token } = useParams<{ token: string }>();
+    const { id } = useParams<{ id: string }>();
+    const { isAuthenticated } = useAuth();
+    const { token: queryToken, isValid, hasTokenParam } = useMobileToken();
+
+    const tokenFromPath = id || '';
+    const token = queryToken || tokenFromPath;
+    const hasTokenValue = token.trim().length > 0 || (hasTokenParam && isValid);
+    const tokenInvalid = (hasTokenParam && !isValid) || (!isAuthenticated && !hasTokenValue);
+
+    if (tokenInvalid) {
+        return (
+            <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center px-6 text-center">
+                <p className="text-lg font-semibold">QR expired. Please rescan at kiosk.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col relative overflow-hidden font-sans">

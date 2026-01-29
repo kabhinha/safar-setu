@@ -20,7 +20,11 @@ class AuthTests(TestCase):
             "username": "newuser",
             "email": "new@example.com",
             "password": "password123",
-            "invite_code": "TEST-INVITE"
+            "invite_code": "TEST-INVITE",
+            "phone_number": "9999999999",
+            "nationality": "INDIAN",
+            "identity_type": "Aadhaar",
+            "identity_value": "TESTID1234"
         }
         response = self.client.post('/api/v1/auth/signup/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -30,7 +34,12 @@ class AuthTests(TestCase):
         data = {
             "username": "baduser",
             "password": "password123",
-            "invite_code": "WRONG-CODE"
+            "email": "bad@example.com",
+            "invite_code": "WRONG-CODE",
+            "phone_number": "8888888888",
+            "nationality": "INDIAN",
+            "identity_type": "Aadhaar",
+            "identity_value": "TESTID9999"
         }
         response = self.client.post('/api/v1/auth/signup/', data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

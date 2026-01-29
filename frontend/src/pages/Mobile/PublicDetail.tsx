@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { PublicMobileLayout } from '../../components/layout/PublicMobileLayout';
-import { Loader2, AlertTriangle, MapPin, Clock, Shield } from 'lucide-react';
+import { Loader2, AlertTriangle, Clock, Shield } from 'lucide-react';
 import { InquiryForm } from './components/InquiryForm';
+import { useMobileToken } from './hooks/useMobileToken';
 
 interface DetailData {
     id: string;
@@ -20,8 +21,15 @@ const PublicDetail: React.FC<{ type: 'hotspot' | 'sight' }> = ({ type }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showInquiry, setShowInquiry] = useState(false);
+    const { isValid, hasTokenParam } = useMobileToken();
+    const tokenInvalid = hasTokenParam && !isValid;
 
     useEffect(() => {
+        if (tokenInvalid) {
+            setLoading(false);
+            return;
+        }
+
         const fetchData = async () => {
             try {
                 const endpoint = type === 'hotspot'
@@ -41,7 +49,17 @@ const PublicDetail: React.FC<{ type: 'hotspot' | 'sight' }> = ({ type }) => {
             }
         };
         fetchData();
-    }, [id, type]);
+    }, [id, type, tokenInvalid]);
+
+    if (tokenInvalid) {
+        return (
+            <PublicMobileLayout>
+                <div className="p-10 text-center text-slate-600 font-semibold">
+                    QR expired. Please rescan at kiosk.
+                </div>
+            </PublicMobileLayout>
+        );
+    }
 
     if (loading) return (
         <PublicMobileLayout>
