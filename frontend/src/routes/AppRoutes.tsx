@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Suspense, lazy } from 'react';
 import BottomNav from '../components/layout/BottomNav';
 import { UserRole } from '../contracts/enums';
+import { MissionAppLayout } from '../components/layout/MissionAppLayout';
 
 // Lazy load pages
 const Landing = lazy(() => import('../pages/Landing'));
@@ -18,19 +19,22 @@ const CreateHotspot = lazy(() => import('../pages/host/CreateHotspot'));
 const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'));
 const CommerceDemo = lazy(() => import('../pages/commerce/Demo'));
 const Authenticator = lazy(() => import('../pages/mobile/Authenticator'));
-const KioskApp = lazy(() => import('../pages/kiosk'));
-const KioskDiscovery = lazy(() => import('../pages/kiosk/Discovery').then(module => ({ default: module.KioskDiscovery })));
-const KioskDiscoveryResults = lazy(() => import('../pages/kiosk/DiscoveryResults').then(module => ({ default: module.KioskDiscoveryResults })));
 const KioskSights = lazy(() => import('../pages/kiosk/Sights').then(module => ({ default: module.KioskSights })));
 const KioskMart = lazy(() => import('../pages/kiosk/Mart').then(module => ({ default: module.KioskMart })));
+const KioskSafety = lazy(() => import('../pages/kiosk/components/SafetyPanel'));
 const VendorScan = lazy(() => import('../pages/Vendor/Scan'));
+
+const MobileDealReceipt = lazy(() => import('../pages/mobile/MobileDealReceipt'));
+const MobileSafety = lazy(() => import('../pages/mobile/MobileSafety'));
+const MobileBroadcasts = lazy(() => import('@/pages/mobile/MobileBroadcasts'));
+const PublicDetail = lazy(() => import('../pages/mobile/PublicDetail'));
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, roles }: { children: React.ReactNode, roles?: string[] }) => {
     const { user, isAuthenticated, isLoading } = useAuth();
 
     if (isLoading) return <div className="p-4">Loading...</div>;
-    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    if (!isAuthenticated) return <Navigate to="/m/login" replace />;
     // Ensure we check against enum or string correctly
     if (roles && user && !roles.includes(user.role)) {
         return <Navigate to="/" replace />; // Unauthorized
@@ -53,54 +57,76 @@ const MainLayout = () => {
     );
 };
 
+// Wrapper for Mission App (User Context)
+const MissionLayoutWrapper = () => {
+    return (
+        <MissionAppLayout>
+            <Outlet />
+        </MissionAppLayout>
+    );
+};
+
 export default function AppRoutes() {
     return (
-        <Suspense fallback={<div className="flex items-center justify-center h-screen text-white">Loading...</div>}>
+        <Suspense fallback={<div className="flex items-center justify-center h-screen text-slate-500">Loading...</div>}>
             <Routes>
-                <Route path="/kiosk/*" element={<KioskApp />} />
-                <Route path="/kiosk/discover" element={<KioskDiscovery />} />
-                <Route path="/kiosk/discover/results" element={<KioskDiscoveryResults />} />
                 <Route path="/kiosk/sights" element={<KioskSights />} />
                 <Route path="/kiosk/mart" element={<KioskMart />} />
+                <Route path="/kiosk/safety" element={<KioskSafety />} />
                 <Route path="/vendor/scan" element={<VendorScan />} />
 
-                <Route element={<MainLayout />}>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
+                {/* Mobile Public Routes (QR Entry) */}
+                <Route path="/m/hotspot/:id" element={
+                    <ProtectedRoute roles={[UserRole.TRAVELER, UserRole.HOST]}>
+                        <PublicDetail type="hotspot" />
+                    </ProtectedRoute>
+                } />
+                <Route path="/m/sight/:id" element={
+                    <ProtectedRoute roles={[UserRole.TRAVELER, UserRole.HOST]}>
+                        <PublicDetail type="sight" />
+                    </ProtectedRoute>
+                } />
+                <Route path="/m/deal/:token" element={<MobileDealReceipt />} />
+                <Route path="/mobile/safety" element={<MobileSafety />} />
+                <Route path="/mobile/broadcasts" element={<MobileBroadcasts />} />
 
-                    {/* Traveler Routes */}
-                    <Route path="/feed" element={
+                {/* Mission App Routes (User Context) */}
+                <Route element={<MissionLayoutWrapper />}>
+                    <Route path="/m/feed" element={
                         <ProtectedRoute roles={[UserRole.TRAVELER]}>
                             <TravelerHome />
                         </ProtectedRoute>
                     } />
-
-                    {/* Public Discovery */}
-                    <Route path="/hotspot/:id" element={<HotspotDetail />} />
-                    <Route path="/commerce/demo" element={<CommerceDemo />} />
-
-                    <Route path="/chat" element={
+                    <Route path="/m/chat" element={
                         <ProtectedRoute roles={[UserRole.TRAVELER]}>
                             <Chat />
                         </ProtectedRoute>
                     } />
-                    <Route path="/profile" element={
+                    <Route path="/m/profile" element={
                         <ProtectedRoute roles={[UserRole.TRAVELER]}>
                             <Profile />
                         </ProtectedRoute>
                     } />
-                    <Route path="/settings" element={
+                    <Route path="/m/settings" element={
                         <ProtectedRoute roles={[UserRole.TRAVELER]}>
                             <Settings />
                         </ProtectedRoute>
                     } />
-
-                    <Route path="/authenticator" element={
+                    <Route path="/m/authenticator" element={
                         <ProtectedRoute roles={[UserRole.TRAVELER]}>
                             <Authenticator />
                         </ProtectedRoute>
                     } />
+                </Route>
+
+                <Route element={<MainLayout />}>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/m/login" element={<Login />} />
+                    <Route path="/m/signup" element={<Signup />} />
+
+                    {/* Public Discovery (Web) */}
+                    <Route path="/m/hotspot/:id" element={<HotspotDetail />} />
+                    <Route path="/m/commerce/demo" element={<CommerceDemo />} />
 
                     {/* Host Routes */}
                     <Route path="/host" element={

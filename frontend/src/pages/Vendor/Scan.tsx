@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { QrCode, Camera, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Camera, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 const VendorScan = () => {
     const [token, setToken] = useState('');

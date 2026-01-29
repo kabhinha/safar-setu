@@ -43,7 +43,7 @@ class CommerceInitiateView(APIView):
         
         return Response({
             "deal_id": deal.id,
-            "token_value": token.token_value, # This is QR-1 payload
+            "token_value": f"/m/deal/{token.token_value}", # This is formatted as a deep link now
             "expires_at": token.expires_at,
             "status": deal.status
         })
@@ -63,8 +63,12 @@ class CommerceScanView(APIView):
         if not token_value:
             return Response({"error": "Token value required"}, status=400)
             
+        # Strip potential URL prefix if scanned from QR
+        # Formats: /m/deal/<uuid>, http://.../m/deal/<uuid>, or just <uuid>
+        clean_token = token_value.split('/')[-1]
+            
         try:
-             token = DealToken.objects.get(token_value=token_value)
+             token = DealToken.objects.get(token_value=clean_token)
         except DealToken.DoesNotExist:
              return Response({"error": "Invalid token"}, status=404)
              

@@ -4,7 +4,7 @@ import api from '../services/api';
 
 interface AuthState {
     user: User | null;
-    token: string | null; // Added
+    token: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (creds: any) => Promise<void>;

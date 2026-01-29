@@ -30,4 +30,8 @@ React + Vite application serving two distinct experiences:
 - `/admin/approvals`: Content Moderation Queue.
 
 ### Kiosk (Lazy Loaded)
-- `/kiosk/*`: Kiosk-specific routes (Attract Screen, Home Grid, etc.).
+- `/kiosk/auth`: Device Login/Pairing.
+- `/kiosk/discovery`: Hotspot Explorer.
+- `/kiosk/sights`: Static Sights Catalog.
+- `/kiosk/mart`: Commerce/Product Demo.
+- `/kiosk/safety`: Broadcasts & Emergency Panel.

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Send, Bot, User, Sparkles } from 'lucide-react';
+import { Send, Bot } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 interface Message {
@@ -39,46 +39,44 @@ const Chat = () => {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-64px)] bg-[#0a0a0a] pb-24">
-            <div className="bg-[#0a0a0a]/80 backdrop-blur-md p-4 border-b border-white/5 sticky top-0 z-10">
+        <div className="flex flex-col h-[calc(100vh-64px)] bg-slate-50 pt-[56px] pb-20">
+            <div className="bg-white border-b border-slate-200 px-4 py-3 sticky top-[56px] z-10 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 p-[1px]">
-                        <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
-                            <Sparkles className="h-5 w-5 text-blue-400" />
-                        </div>
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                        <Bot className="h-4 w-4 text-slate-600" />
                     </div>
                     <div>
-                        <h1 className="font-bold text-white tracking-tight">AI Companion</h1>
+                        <h1 className="font-bold text-slate-900 text-sm tracking-wide">OFFICIAL ASSISTANT</h1>
                         <div className="flex items-center gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[10px] text-gray-500 uppercase tracking-wider">Online</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                            <span className="text-[10px] text-slate-500 uppercase tracking-wider">Automated</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map(msg => (
                     <div key={msg.id} className={cn("flex gap-3", msg.sender === 'user' ? "flex-row-reverse" : "")}>
                         <div className={cn(
-                            "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border",
-                            msg.sender === 'user' ? "bg-white/10 border-white/5" : "bg-blue-500/10 border-blue-500/30"
+                            "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border text-xs",
+                            msg.sender === 'user' ? "bg-slate-200 border-slate-300 text-slate-600" : "bg-white border-slate-200 text-slate-600"
                         )}>
-                            {msg.sender === 'user' ? <User className="h-4 w-4 text-gray-300" /> : <Bot className="h-4 w-4 text-blue-400" />}
+                            {msg.sender === 'user' ? "You" : <Bot className="h-4 w-4" />}
                         </div>
                         <div className={cn(
-                            "max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed",
+                            "max-w-[85%] rounded-lg p-3 text-sm leading-relaxed border",
                             msg.sender === 'user'
-                                ? "bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-tr-sm shadow-lg shadow-blue-900/20"
-                                : "bg-white/5 border border-white/10 text-gray-300 rounded-tl-sm"
+                                ? "bg-slate-800 text-white border-slate-700"
+                                : "bg-white text-slate-800 border-slate-200"
                         )}>
                             <p>{msg.text}</p>
                             {msg.citations && msg.citations.length > 0 && (
-                                <div className="mt-3 pt-3 border-t border-white/10">
-                                    <p className="text-[10px] uppercase tracking-widest text-blue-400/80 mb-2">Sources</p>
-                                    <div className="flex flex-wrap gap-2">
+                                <div className="mt-2 pt-2 border-t border-slate-100">
+                                    <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">References</p>
+                                    <div className="flex flex-wrap gap-1">
                                         {msg.citations.map(c => (
-                                            <span key={c} className="text-xs bg-black/30 border border-white/10 px-2.5 py-1 rounded-md text-gray-400 hover:text-white transition-colors cursor-pointer">{c}</span>
+                                            <span key={c} className="text-[10px] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-600 font-medium">{c}</span>
                                         ))}
                                     </div>
                                 </div>
@@ -88,11 +86,11 @@ const Chat = () => {
                 ))}
             </div>
 
-            <form onSubmit={handleSend} className="p-4 bg-[#0a0a0a] border-t border-white/5">
+            <form onSubmit={handleSend} className="p-4 bg-slate-50 border-t border-slate-200">
                 <div className="relative flex items-center gap-2">
                     <Input
-                        className="flex-1 bg-white/5 border-white/10 focus:border-blue-500/50 min-h-[50px] rounded-full px-6"
-                        placeholder="Query neural network..."
+                        className="flex-1 bg-white border-slate-300 focus:border-slate-500 focus:ring-1 focus:ring-slate-500 min-h-[44px] rounded-lg px-4 text-slate-800"
+                        placeholder="Type an official inquiry..."
                         value={input}
                         onChange={e => setInput(e.target.value)}
                     />
@@ -100,10 +98,10 @@ const Chat = () => {
                         type="submit"
                         size="md"
                         variant="primary"
-                        className="rounded-full w-12 h-12 p-0 flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white border-none shadow-[0_0_15px_rgba(37,99,235,0.4)]"
+                        className="rounded-lg w-12 h-11 p-0 flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white border-none shadow-sm"
                         disabled={!input.trim()}
                     >
-                        <Send className="h-5 w-5 ml-0.5 mt-0.5" />
+                        <Send className="h-4 w-4" />
                     </Button>
                 </div>
             </form>

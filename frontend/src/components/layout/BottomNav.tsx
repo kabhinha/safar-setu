@@ -7,15 +7,18 @@ const BottomNav = () => {
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] max-w-sm h-16 glass rounded-full flex justify-around items-center z-50 px-6 shadow-2xl shadow-black/50">
-            <Link to="/feed" className={cn("flex flex-col items-center justify-center transition-all duration-300", isActive('/feed') ? "text-blue-400 scale-110" : "text-gray-500 hover:text-gray-300")}>
-                <Home className="h-6 w-6" strokeWidth={isActive('/feed') ? 2.5 : 2} />
+        <div className="fixed bottom-0 left-0 w-full h-16 bg-white border-t border-slate-200 flex justify-around items-center z-50">
+            <Link to="/m/feed" className={cn("flex flex-col items-center justify-center gap-1 w-full h-full", isActive('/feed') ? "text-slate-900" : "text-slate-400 hover:text-slate-600")}>
+                <Home className="h-5 w-5" strokeWidth={isActive('/feed') ? 2.5 : 2} />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Feed</span>
             </Link>
-            <Link to="/chat" className={cn("flex flex-col items-center justify-center transition-all duration-300", isActive('/chat') ? "text-blue-400 scale-110" : "text-gray-500 hover:text-gray-300")}>
-                <MessageCircle className="h-6 w-6" strokeWidth={isActive('/chat') ? 2.5 : 2} />
+            <Link to="/m/profile" className={cn("flex flex-col items-center justify-center gap-1 w-full h-full", isActive('/profile') ? "text-slate-900" : "text-slate-400 hover:text-slate-600")}>
+                <User className="h-5 w-5" strokeWidth={isActive('/profile') ? 2.5 : 2} />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Mission Data</span>
             </Link>
-            <Link to="/profile" className={cn("flex flex-col items-center justify-center transition-all duration-300", isActive('/profile') ? "text-blue-400 scale-110" : "text-gray-500 hover:text-gray-300")}>
-                <User className="h-6 w-6" strokeWidth={isActive('/profile') ? 2.5 : 2} />
+            <Link to="/m/chat" className={cn("flex flex-col items-center justify-center gap-1 w-full h-full", isActive('/chat') ? "text-slate-900" : "text-slate-400 hover:text-slate-600")}>
+                <MessageCircle className="h-5 w-5" strokeWidth={isActive('/chat') ? 2.5 : 2} />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Official Comms</span>
             </Link>
         </div>
     );

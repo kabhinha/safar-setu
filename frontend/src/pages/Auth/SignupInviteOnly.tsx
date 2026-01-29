@@ -5,6 +5,7 @@ import api from '../../services/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
+import GovtNavbar from '../../components/layout/GovtNavbar';
 import { Shield, Key } from 'lucide-react';
 
 const Signup = () => {
@@ -21,80 +22,79 @@ const Signup = () => {
             await api.post('/auth/verify-invite/', {
                 invite_code: data.invite_code,
                 email: data.email,
-                password: data.password // Setting password for the first time
+                password: data.password
             });
 
             navigate('/login?role=' + role);
         } catch (err: any) {
             console.error(err);
-            setError(err.response?.data?.message || 'Invalid Invite Code or Identity');
+            setError(err.response?.data?.message || 'Invalid Invite Code or Identity Record');
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,1),rgba(0,0,0,1))] -z-10" />
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+            <GovtNavbar showUserBadge={false} />
 
-            <Card className="max-w-md w-full p-8 border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl">
-                <div className="text-center mb-8">
-                    <div className="mx-auto h-12 w-12 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10">
-                        <Key className="h-6 w-6 text-blue-400" />
+            <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6">
+                <Card className="max-w-md w-full p-8 border-slate-200 bg-white shadow-sm">
+                    <div className="text-center mb-8 space-y-2">
+                        <div className="mx-auto h-10 w-10 bg-slate-900 rounded-full flex items-center justify-center mb-4">
+                            <Key className="h-5 w-5 text-white" />
+                        </div>
+                        <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                            Restricted Access Protocol
+                        </h2>
+                        <p className="text-xs text-slate-500 leading-relaxed max-w-[260px] mx-auto">
+                            This is a governed platform. Entry requires a government-issued invite code.
+                        </p>
                     </div>
-                    <h2 className="text-2xl font-bold text-white tracking-tight">
-                        Restricted Access
-                    </h2>
-                    <p className="mt-2 text-sm text-gray-500">
-                        SAFARSETU is a governed platform.<br />
-                        Enter your government-issued invite code to proceed.
-                    </p>
-                </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                    <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                         <Input
-                            label="Invite Code"
+                            label="Government Invite Code"
                             placeholder="INV-XXXX-XXXX"
-                            className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-blue-500/50 uppercase tracking-widest font-mono"
+                            className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white uppercase tracking-widest font-mono"
                             {...register('invite_code', { required: 'Invite Code is required' })}
                             error={errors.invite_code?.message as string}
                         />
                         <Input
-                            label="Registered Identity (Email)"
+                            label="Identity Record (Email)"
                             type="email"
                             placeholder="name@example.com"
-                            className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-blue-500/50"
+                            className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white"
                             {...register('email', { required: 'Email is required' })}
                             error={errors.email?.message as string}
                         />
                         <Input
-                            label="Set Secure Key"
+                            label="Set Secure Passkey"
                             type="password"
                             placeholder="••••••••"
-                            className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-blue-500/50"
+                            className="bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white"
                             {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'Min 6 chars' } })}
                             error={errors.password?.message as string}
                         />
 
                         {error && (
-                            <div className="flex items-center gap-2 text-red-400 text-xs bg-red-500/10 p-3 rounded border border-red-500/20">
-                                <Shield className="h-4 w-4 shrink-0" />
-                                {error}
+                            <div className="p-3 bg-red-50 border border-red-100 rounded flex items-center gap-2">
+                                <Shield className="h-4 w-4 text-red-600" />
+                                <span className="text-xs text-red-700 font-medium">{error}</span>
                             </div>
                         )}
 
-                        <Button type="submit" className="w-full mt-4 bg-white text-black hover:bg-gray-200" isLoading={isSubmitting}>
+                        <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white shadow-none mt-2" isLoading={isSubmitting}>
                             Verify & Initialize Identity
                         </Button>
-                    </div>
-                </form>
+                    </form>
 
-                <div className="mt-8 text-center border-t border-white/5 pt-6">
-                    <span className="text-gray-600 text-xs block mb-2">Have a Guest or Curiosity ID?</span>
-                    <Link to={`/login?role=${role}`} className="text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors">
-                        Access Existing Account
-                    </Link>
-                </div>
-            </Card>
+                    <div className="mt-8 text-center border-t border-slate-100 pt-6">
+                        <span className="text-slate-500 text-xs">Existing permit? </span>
+                        <Link to={`/login?role=${role}`} className="text-slate-900 hover:underline text-xs font-bold ml-1">
+                            Access System
+                        </Link>
+                    </div>
+                </Card>
+            </div>
         </div>
     );
 };

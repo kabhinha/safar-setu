@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, RefreshCw, Smartphone, Monitor } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Monitor, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import GovtNavbar from '../../components/layout/GovtNavbar';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 
 const Authenticator = () => {
     const navigate = useNavigate();
-    // const { user } = useAuth(); 
     const [code, setCode] = useState<string | null>(null);
     const [expiresIn, setExpiresIn] = useState<number>(0);
     const [loading, setLoading] = useState(false);
@@ -15,102 +17,91 @@ const Authenticator = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await api.post('/auth/kiosk-code/');
+            const response = await api.post('http://localhost:8000/api/v1/auth/kiosk-code/');
             const data = response.data;
-
-            setCode(data.formatted_code); // "123-456"
+            setCode(data.formatted_code);
             setExpiresIn(data.expires_in_seconds);
         } catch (err) {
             console.error(err);
-            setError('Could not generate code. Please try again.');
+            setError('System Error: Could not generate entry token.');
         } finally {
             setLoading(false);
         }
     };
 
-    // Auto-generate on mount
     useEffect(() => {
         generateCode();
     }, []);
 
-    // Countdown Timer
     useEffect(() => {
         if (!expiresIn || expiresIn <= 0) return;
-
         const interval = setInterval(() => {
             setExpiresIn((prev) => prev - 1);
         }, 1000);
-
         return () => clearInterval(interval);
     }, [expiresIn]);
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 flex flex-col">
-            {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
-                <button onClick={() => navigate(-1)} className="p-2 bg-white/10 rounded-full hover:bg-white/20">
-                    <ArrowLeft className="h-6 w-6" />
-                </button>
-                <h1 className="text-xl font-bold">Kiosk Connect</h1>
-            </div>
+        <div className="min-h-screen bg-slate-50 flex flex-col">
+            <GovtNavbar showUserBadge={false} />
 
-            {/* Main Card */}
-            <div className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full gap-8">
+            <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
 
-                <div className="text-center space-y-2">
-                    <div className="flex justify-center gap-4 text-blue-400 mb-4 opacity-80">
-                        <Smartphone className="h-8 w-8" />
-                        <RefreshCw className="h-6 w-6 animate-spin-slow self-center" />
-                        <Monitor className="h-10 w-10 text-purple-400" />
+                <div className="text-center space-y-2 max-w-xs">
+                    <div className="flex justify-center mb-4">
+                        <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200">
+                            <Monitor className="h-6 w-6 text-slate-600" />
+                        </div>
                     </div>
-                    <h2 className="text-2xl font-bold">Connect to Kiosk</h2>
-                    <p className="text-gray-400 text-sm">
-                        Enter this code on the public kiosk to login securely for 10 minutes.
+                    <h2 className="text-xl font-bold text-slate-900 tracking-tight">Kiosk Connection</h2>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                        Enter this secure token on the public terminal to access your Mission Log.
                     </p>
                 </div>
 
-                {/* Code Display */}
-                <div className="bg-[#1e293b] border border-blue-500/30 p-8 rounded-3xl w-full text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gray-800">
+                <Card className="w-full max-w-sm bg-white border-slate-200 shadow-sm overflow-hidden relative p-8 text-center">
+                    {/* Progress Bar */}
+                    <div className="absolute top-0 left-0 w-full h-1 bg-slate-100">
                         <div
-                            className="h-full bg-blue-500 transition-all duration-1000 ease-linear"
+                            className="h-full bg-slate-900 transition-all duration-1000 ease-linear"
                             style={{ width: `${(expiresIn / 120) * 100}%` }}
                         />
                     </div>
 
                     {loading ? (
-                        <div className="h-16 flex items-center justify-center">
-                            <RefreshCw className="h-8 w-8 animate-spin text-gray-500" />
+                        <div className="py-8 flex justify-center">
+                            <RefreshCw className="h-6 w-6 animate-spin text-slate-400" />
                         </div>
                     ) : error ? (
-                        <div className="text-red-400 text-sm font-medium">{error}</div>
+                        <div className="py-8 text-red-600 text-xs font-bold">{error}</div>
                     ) : (
-                        <div className="space-y-2">
-                            <div className="text-5xl font-mono font-bold tracking-wider text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]">
+                        <div className="space-y-4 py-4">
+                            <div className="text-4xl font-mono font-bold tracking-widest text-slate-900">
                                 {code || '---'}
                             </div>
-                            <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">
+                            <div className="flex items-center justify-center gap-2 text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+                                <Shield className="h-3 w-3" />
                                 Valid for {Math.floor(expiresIn / 60)}:{(expiresIn % 60).toString().padStart(2, '0')}
-                            </p>
+                            </div>
                         </div>
                     )}
-                </div>
+                </Card>
 
-                {/* Regeneration */}
-                <button
+                <Button
+                    variant="outline"
                     onClick={generateCode}
-                    disabled={loading || expiresIn > 100} // Don't spam
-                    className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-medium transition-all active:scale-95 disabled:opacity-50"
+                    disabled={loading || expiresIn > 100}
+                    className="border-slate-300 text-slate-600 hover:bg-slate-50 min-w-[200px]"
                 >
-                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                    Get new code
-                </button>
-            </div>
+                    <RefreshCw className={`h-3 w-3 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                    Regenerate Token
+                </Button>
 
-            <div className="mt-auto text-center p-4">
-                <p className="text-[10px] text-gray-600 uppercase">
-                    Do not share this code with anyone else.
-                </p>
+                <div className="mt-auto">
+                    <button onClick={() => navigate(-1)} className="text-slate-400 hover:text-slate-600 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                        <ArrowLeft className="h-3 w-3" /> Return
+                    </button>
+                </div>
             </div>
         </div>
     );
