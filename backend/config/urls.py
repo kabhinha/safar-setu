@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/v1/features/', include('features.urls')),
     path('api/v1/kiosk/', include('kiosk.urls')),
     path('api/', include('reco.urls')), # Recommendation Engine (Exposed at /api/public/...)
+    path('api/v1/', include('broadcasts.urls')), # Includes public/broadcasts and admin/broadcasts
 ]
 
 # Admin Branding

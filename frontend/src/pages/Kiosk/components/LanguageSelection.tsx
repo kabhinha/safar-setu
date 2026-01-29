@@ -5,7 +5,7 @@ const LanguageSelection = () => {
 
     const handleSelect = (lang: 'en' | 'hi') => {
         setLanguage(lang);
-        setStep('selection');
+        setStep('home');
     };
 
     return (

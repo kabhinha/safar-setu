@@ -1,6 +1,6 @@
 # Project X - Development Status Report
 
-**Date:** January 18, 2026
+**Date:** January 23, 2026
 **Frameworks:** Django (Backend), React + Vite (Frontend)
 
 ## 1. Core Core Features & Status
@@ -13,6 +13,7 @@
 | **Infrastructure** | ✅ **Complete** | - Dockerized Backend (Django + Gunicorn).<br>- PostgreSQL & Redis Ready.<br>- API Versioning (`/api/v1/`). |
 
 ## 2. Backend Modules (Django Apps)
+*Now modularized under `backend/apps/`*
 
 | App Name | Functionality |
 | :--- | :--- |
@@ -48,12 +49,30 @@
 - [ ] **Host Dashboard**: Route created, simplified UI placeholder.
 - [ ] **Admin Dashboard**: Route created, simplified UI placeholder.
 
-## 4. Recent Critical Fixes
+## 4. Architectural Refactor (Completed Jan 23)
+
+### Repository Structure
+- **Global Path Repair**: Re-organized entire repository structure for scalability.
+  - Backend apps moved to `backend/apps/`.
+  - Shared contracts and permissions extracted to `backend/shared/`.
+  - Services (AI, CCTV) isolated in `services/`.
+  - Frontend folders normalized to lowercase (`src/pages/mobile`).
+
+### Technical Debt Resolution
+- **Decoupling**: `users`, `rbac` and `core` dependencies minimized via Shared Contracts.
+- **Frontend Routing**: Centralized routing logic in `src/routes/AppRoutes.tsx`.
+- **Legacy Code**: Old FastAPI backend archived to `legacy/`.
+- **Verification**: 
+  - Backend: `manage.py check` passing with new paths.
+  - Frontend: `npm run build` passing with strict case-sensitivity.
+
+## 5. Recent Critical Fixes
 - **Login Redirection**: Fixed infinite loop by aligning Frontend Role (`TRAVELER`) with Backend.
 - **Settings Persistence**: Resolved CORS and Serializer issues to allow Profile Updates.
 - **Auth Modernization**: Moved from "Invite Code Prerequisite" to "OTP Verification".
+- **Frontend Kiosk Casing**: Fixed TypeScript build errors due to case-sensitive folder naming (`Kiosk` -> `kiosk`).
 
 ## Next Immediate Steps
-1.  **Host Dashboard**: Implement Listing Management for Hosts.
-2.  **Admin Console**: Build UI for User Management and Moderation Tickets.
-3.  **Deployment**: Setup Staging Environment.
+1.  **CCTV Service Integration**: Connect isolated `services/cctv_analytics` with Backend.
+2.  **Host Dashboard**: Implement Listing Management for Hosts.
+3.  **Admin Console**: Build UI for User Management and Moderation Tickets.

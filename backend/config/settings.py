@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'features',
     'kiosk', # New Kiosk Experience App
     'reco', # Recommendation Engine (Isolated)
+    'broadcasts', # Government Broadcasts
 ]
 
 MIDDLEWARE = [
@@ -162,7 +163,7 @@ REST_FRAMEWORK = {
 }
 
 # CORS
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:3001,http://localhost:5173', cast=Csv())
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://localhost:3001,http://localhost:5173,http://localhost:5174, http://localhost:5175, http://localhost:5176', cast=Csv())
 
 # Celery
 CELERY_BROKER_URL = config('REDIS_URL', default='redis://localhost:6379/0')

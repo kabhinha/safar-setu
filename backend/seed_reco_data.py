@@ -4,6 +4,7 @@ import sys
 import random
 
 sys.path.append(os.getcwd())
+sys.path.append(os.path.join(os.getcwd(), 'apps'))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
@@ -29,7 +30,11 @@ for dist in districts:
             status=Hotspot.Status.Live,
             duration_minutes=60,
             operating_hours="10:00 - 16:00",
-            tags=['Crafts', 'Culture']
+            tags=['Crafts', 'Culture'],
+            approx_travel_time_min=30,
+            distance_band='NEAR',
+            nearest_transport_hub_name=f"{dist} Central Station",
+            nearest_transport_hub_type='RAILWAY_STATION'
         )
     count = Hotspot.objects.filter(district__iexact=dist, status=Hotspot.Status.Live).count()
     print(f"[{dist}] Current Live Hotspots: {count}")
@@ -47,7 +52,11 @@ for dist in districts:
                 sensitivity_level=Hotspot.Sensitivity.Public,
                 duration_minutes=random.choice([60, 120, 180]),
                 operating_hours="09:00 - 18:00",
-                tags=random.sample(tags_pool, 3)
+                tags=random.sample(tags_pool, 3),
+                approx_travel_time_min=random.randint(15, 60),
+                distance_band=random.choice(['NEAR', 'MEDIUM', 'FAR']),
+                nearest_transport_hub_name=f"{dist} Bus Stand",
+                nearest_transport_hub_type='BUS_STAND'
             )
             print(f"Created: {h.name} ({h.tags})")
 

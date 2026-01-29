@@ -6,7 +6,7 @@ export type Language = 'en' | 'hi';
 
 export interface KioskState {
     language: Language;
-    step: 'welcome' | 'language' | 'selection' | 'results' | 'detail';
+    step: 'welcome' | 'language' | 'home' | 'selection' | 'results' | 'detail' | 'safety';
     selectedTime: number | null; // in minutes
     selectedInterests: string[];
     results: any[]; // Replace with proper type later
@@ -28,13 +28,23 @@ const KioskContext = createContext<KioskContextType | undefined>(undefined);
 const IDLE_TIMEOUT_MS = 120000; // 2 minutes
 
 export const KioskProvider = ({ children }: { children: ReactNode }) => {
-    const [state, setState] = useState<KioskState>({
-        language: 'en', // Default, but flow starts with selection usually or defaults
-        step: 'welcome',
-        selectedTime: null,
-        selectedInterests: [],
-        results: [],
-        selectedExperience: null,
+    const [state, setState] = useState<KioskState>(() => {
+        // Initialize based on URL
+        const path = window.location.pathname;
+        let initialStep: KioskState['step'] = 'welcome';
+
+        if (path === '/kiosk/safety') initialStep = 'safety';
+        else if (path === '/kiosk/home') initialStep = 'home';
+        // Add other mappings if needed
+
+        return {
+            language: 'en',
+            step: initialStep,
+            selectedTime: null,
+            selectedInterests: [],
+            results: [],
+            selectedExperience: null,
+        };
     });
 
     // Idle Timer Logic

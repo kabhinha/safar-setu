@@ -14,20 +14,14 @@ import {
 
 import AttractScreen from '../components/layout/AttractScreen';
 import KioskLoginModal from '../components/auth/KioskLoginModal';
-
-// Mock Data for Kiosk
-const SYSTEM_ALERTS = [
-    "Welcome to Sikkim - The Land of Mystique. Please travel responsibly.",
-    "Road Advisory: Gangtok to Nathula route is clear. Permits required.",
-    "Festival Alert: Losar Festival preparations in Rumtek Monastery.",
-    "Wildlife Notice: Red Panda sighting zone active in North District."
-];
+import { DiscoveryOverlay } from './kiosk/components/DiscoveryOverlay';
+import BroadcastTicker from './kiosk/components/BroadcastTicker';
 
 const Landing = () => {
     const navigate = useNavigate();
-    const [currentAlertIndex, setCurrentAlertIndex] = useState(0);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+    const [isDiscoveryOpen, setDiscoveryOpen] = useState(false);
     // const [kioskUser, setKioskUser] = useState<any>(null);
 
     // Attract Mode Logic
@@ -61,14 +55,6 @@ const Landing = () => {
         };
     }, [isIdle]);
 
-    // Ticker Logic
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentAlertIndex((prev) => (prev + 1) % SYSTEM_ALERTS.length);
-        }, 5000);
-        return () => clearInterval(interval);
-    }, []);
-
     // Clock Logic
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -78,10 +64,15 @@ const Landing = () => {
     const handleTileClick = (route: string) => {
         // Placeholder navigation
         console.log(`Navigating to ${route}`);
+
+        if (route === '/discovery') {
+            setDiscoveryOpen(true);
+            return;
+        }
+
         // If route exists, navigate. Else show splash?
         // For now, allow "walk-in" which might correspond to abstract discovery
-        if (route === '/discovery') navigate('/hotspot/1'); // Demo
-        else if (route === '/commerce') navigate('/commerce/demo'); // Demo
+        if (route === '/commerce') navigate('/commerce/demo'); // Demo
         else navigate(route);
     };
 
@@ -90,11 +81,14 @@ const Landing = () => {
             {/* Attract Screen Overlay */}
             {isIdle && <AttractScreen onDismiss={() => setIsIdle(false)} />}
 
+            {/* Discovery Mode Overlay */}
+            <DiscoveryOverlay isOpen={isDiscoveryOpen} onClose={() => setDiscoveryOpen(false)} />
+
             {/* --------------------------------------------------------------------------------
                1) TOP AUTHORITY BAR
                -------------------------------------------------------------------------------- */}
-            <header className="h-[10vh] bg-[#1e293b] border-b border-white/10 flex flex-col">
-                <div className="flex-1 flex items-center justify-between px-6">
+            <header className="bg-[#1e293b] border-b border-white/10 flex flex-col">
+                <div className="h-[10vh] flex items-center justify-between px-6">
                     <div className="flex items-center gap-4">
                         {/* Gov Logo Placeholder */}
                         <div className="h-12 w-12 bg-yellow-500 rounded-full flex items-center justify-center font-bold text-black border-2 border-white/20 shadow-lg shadow-yellow-500/20">
@@ -129,14 +123,7 @@ const Landing = () => {
                 </div>
 
                 {/* Ticker */}
-                <div className="h-8 bg-blue-900/30 flex items-center px-4 overflow-hidden relative">
-                    <div className="absolute left-0 h-full w-12 bg-gradient-to-r from-blue-900/30 to-transparent z-10" />
-                    <Info className="h-4 w-4 text-blue-400 mr-3 flex-shrink-0" />
-                    <p className="text-sm font-medium text-blue-200 whitespace-nowrap animate-pulse">
-                        {SYSTEM_ALERTS[currentAlertIndex]}
-                    </p>
-                    <div className="absolute right-0 h-full w-12 bg-gradient-to-l from-blue-900/30 to-transparent z-10" />
-                </div>
+                <BroadcastTicker />
             </header>
 
             {/* --------------------------------------------------------------------------------
@@ -147,7 +134,10 @@ const Landing = () => {
                 {/* 1) LEFT COLUMN: STATUS & ALERTS (20%) */}
                 <aside className="w-[240px] flex flex-col gap-4">
                     {/* Emergency Card */}
-                    <div className="bg-red-900/10 border border-red-500/20 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2">
+                    <button
+                        onClick={() => navigate('/kiosk/safety')}
+                        className="w-full bg-red-900/10 border border-red-500/20 rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 hover:bg-red-900/20 active:scale-95 transition-all"
+                    >
                         <div className="h-10 w-10 bg-red-500 rounded-full flex items-center justify-center animate-pulse shadow-lg shadow-red-500/20">
                             <Phone className="h-5 w-5 text-white" />
                         </div>
@@ -155,27 +145,31 @@ const Landing = () => {
                             <p className="text-[10px] text-red-300 font-bold uppercase tracking-wider">Emergency</p>
                             <p className="text-xl font-bold text-white">100 / 112</p>
                         </div>
-                    </div>
+                    </button>
 
                     {/* Crowd Monitor */}
-                    <div className="bg-[#1e293b] border border-white/5 rounded-2xl p-4 flex flex-col gap-3 flex-1">
-                        <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                    <button
+                        onClick={() => navigate('/kiosk/safety')}
+                        className="w-full bg-[#1e293b] border border-white/5 rounded-2xl p-4 flex flex-col gap-3 flex-1 hover:border-yellow-400/30 transition-all text-left"
+                    >
+                        <div className="flex items-center gap-2 border-b border-white/5 pb-2 w-full">
                             <Users className="h-4 w-4 text-yellow-400" />
                             <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Crowd Level</p>
                         </div>
-                        <div className="flex-1 flex flex-col justify-end gap-1">
+                        <div className="flex-1 flex flex-col justify-end gap-1 w-full">
                             <div className="w-full bg-white/5 flex-1 rounded-t-sm relative overflow-hidden">
-                                <div className="absolute bottom-0 w-full h-[30%] bg-yellow-400/20" />
+                                {/* <div className="absolute bottom-0 w-full h-[30%] bg-yellow-400/20" /> */}
                             </div>
                             <div className="w-full bg-white/5 flex-1 relative overflow-hidden">
                                 <div className="absolute bottom-0 w-full h-[60%] bg-yellow-400/50" />
                             </div>
                             <div className="w-full bg-white/5 flex-1 rounded-b-sm relative overflow-hidden">
-                                <div className="absolute bottom-0 w-full h-[0%] bg-yellow-400" />
+                                <div className="absolute bottom-0 w-full h-[100%] bg-yellow-400" />
                             </div>
                         </div>
-                        <p className="text-center text-sm font-bold text-yellow-400">Moderate</p>
-                    </div>
+                        <p className="text-center text-sm font-bold text-yellow-400 w-full">Moderate</p>
+                        <p className="text-[10px] text-center text-gray-500 opacity-60">Tap for details</p>
+                    </button>
 
                     {/* Weather / System */}
                     <div className="bg-[#1e293b] border border-white/5 rounded-2xl p-4 flex items-center justify-between">
@@ -210,7 +204,7 @@ const Landing = () => {
 
                     {/* Tile 2: Experiences */}
                     <button
-                        onClick={() => handleTileClick('/experiences')}
+                        onClick={() => handleTileClick('/kiosk/sights')}
                         className="group relative bg-[#1e293b] rounded-2xl p-6 border border-white/5 hover:border-purple-500/50 hover:bg-[#253045] transition-all duration-200 flex flex-col items-center justify-center text-center gap-4 active:scale-[0.98]"
                     >
                         <div className="h-16 w-16 bg-purple-500/10 rounded-2xl flex items-center justify-center group-hover:bg-purple-500/20 transition-colors shadow-inner">
@@ -224,7 +218,7 @@ const Landing = () => {
 
                     {/* Tile 3: Products */}
                     <button
-                        onClick={() => handleTileClick('/commerce')}
+                        onClick={() => handleTileClick('/kiosk/mart')}
                         className="group relative bg-[#1e293b] rounded-2xl p-6 border border-white/5 hover:border-emerald-500/50 hover:bg-[#253045] transition-all duration-200 flex flex-col items-center justify-center text-center gap-4 active:scale-[0.98]"
                     >
                         <div className="h-16 w-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors shadow-inner">
