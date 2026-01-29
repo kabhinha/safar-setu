@@ -3,6 +3,35 @@ import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { Check, Eye, FileText } from 'lucide-react';
 import api from '../../services/api';
+import { tiles as initialTiles } from '../data/tiles';
+import DynamicTile from '../components/DynamicTile';
+
+
+export default function Dashboard() {
+  const [tiles, setTiles] = useState(initialTiles);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTiles(prev => shuffle(prev));
+    }, 8000); // change every 8 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div
+      className="grid gap-6 p-6"
+      style={{
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gridAutoRows: '160px',
+      }}
+    >
+      {tiles.map(tile => (
+        <DynamicTile key={tile.id} tile={tile} />
+      ))}
+    </div>
+  );
+}
 
 const AdminDashboard = () => {
     const { token, logout } = useAuth();
