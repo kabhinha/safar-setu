@@ -1,4 +1,5 @@
 from django.contrib import admin
+from apps.core.admin_utils import register_all_models
 from .models import KioskDevice, KioskHeartbeat
 
 class HeartbeatInline(admin.TabularInline):
@@ -14,3 +15,6 @@ class KioskDeviceAdmin(admin.ModelAdmin):
     list_filter = ('status', 'district_name')
     search_fields = ('name', 'hardware_id')
     inlines = [HeartbeatInline]
+
+# register any remaining kiosk models for visibility
+register_all_models('kiosk', exclude={'KioskDevice', 'KioskHeartbeat'})

@@ -16,6 +16,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
     identity_value = serializers.CharField(required=True)
     address = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     invite_code = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    full_name = serializers.CharField(required=True, allow_blank=False)
     
     class Meta:
         model = User
@@ -31,6 +32,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
             'identity_value',
             'address',
             'invite_code',
+            'full_name',
         )
 
     def validate(self, attrs):
@@ -38,12 +40,16 @@ class UserSignupSerializer(serializers.ModelSerializer):
         country = attrs.get('country')
         phone = attrs.get('phone_number', '')
         invite_code = attrs.get('invite_code')
+        full_name = (attrs.get('full_name') or '').strip()
 
         if nationality == 'FOREIGN' and not country:
             raise serializers.ValidationError({"country": "Country is required for foreign nationals."})
 
         if phone and not phone.isdigit():
             raise serializers.ValidationError({"phone_number": "Phone number must contain digits only."})
+
+        if not full_name:
+            raise serializers.ValidationError({"full_name": "Full name is required."})
 
         if invite_code:
             try:
@@ -65,6 +71,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
         identity_value = validated_data.pop('identity_value', None)
         address = validated_data.pop('address', None)
         invite_obj = validated_data.pop('invite_obj', None)
+        full_name = validated_data.pop('full_name', '').strip()
         validated_data.pop('invite_code', None)
         
         user = User.objects.create(
@@ -79,6 +86,11 @@ class UserSignupSerializer(serializers.ModelSerializer):
             identity_value=identity_value,
             address=address
         )
+        if full_name:
+            parts = full_name.split(' ', 1)
+            user.first_name = parts[0]
+            if len(parts) > 1:
+                user.last_name = parts[1]
         user.set_password(password)
         user.save()
 

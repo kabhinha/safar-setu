@@ -78,7 +78,7 @@ const Login = () => {
 
                     <div className="mt-8 text-center border-t border-slate-100 pt-6">
                         <span className="text-slate-500 text-xs">No official record? </span>
-                        <Link to={`/signup?role=${role}`} className="text-slate-900 hover:underline text-xs font-bold ml-1">
+                        <Link to={`/m/signup`} className="text-slate-900 hover:underline text-xs font-bold ml-1">
                             Request Entry Permit
                         </Link>
                     </div>

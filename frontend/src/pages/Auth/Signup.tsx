@@ -99,6 +99,7 @@ const Signup = () => {
             username: email.split('@')[0],
             email,
             password: data.password,
+            full_name: data.full_name,
             phone_number: data.phone,
             nationality: normalizedNationality,
             country: normalizedNationality === 'FOREIGN' ? data.country : 'India',
@@ -108,7 +109,7 @@ const Signup = () => {
         };
 
         try {
-            await api.post('/auth/signup/', payload);
+            await api.post('http://localhost:8000/auth/signup/', payload);
             setStep(2);
         } catch (err: any) {
             const data = err?.response?.data;
@@ -122,7 +123,7 @@ const Signup = () => {
     const handleVerify = async (data: FormValues) => {
         setError('');
         try {
-            await api.post('/auth/verify/', {
+            await api.post('http://localhost:8000/auth/verify/', {
                 email: submittedEmail || data.email,
                 code: data.verification_code
             });

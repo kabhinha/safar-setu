@@ -16,6 +16,7 @@ import AttractScreen from '../components/layout/AttractScreen';
 import KioskLoginModal from '../components/auth/KioskLoginModal';
 import { DiscoveryOverlay } from './kiosk/components/DiscoveryOverlay';
 import BroadcastTicker from './kiosk/components/BroadcastTicker';
+import safarsetu from '@/assets/safarsetu_logo.png';
 
 const Landing = () => {
     const navigate = useNavigate();
@@ -91,9 +92,7 @@ const Landing = () => {
                 <div className="h-[10vh] flex items-center justify-between px-6">
                     <div className="flex items-center gap-4">
                         {/* Gov Logo Placeholder */}
-                        <div className="h-12 w-12 bg-yellow-500 rounded-full flex items-center justify-center font-bold text-black border-2 border-white/20 shadow-lg shadow-yellow-500/20">
-                            GoS
-                        </div>
+                        <img src={safarsetu} alt="Safarsetu" className="h-12 w-12 bg-yellow-500 rounded-full flex items-center justify-center font-bold text-black border-2 border-white/20 shadow-lg shadow-yellow-500/20" />
                         <div>
                             <h1 className="text-xl font-bold tracking-wider uppercase text-yellow-500">
                                 SIKKIM TOURISM
@@ -154,7 +153,7 @@ const Landing = () => {
                     >
                         <div className="flex items-center gap-2 border-b border-white/5 pb-2 w-full">
                             <Users className="h-4 w-4 text-yellow-400" />
-                            <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Crowd Level</p>
+                            <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Cam Feed</p>
                         </div>
                         <div className="flex-1 flex flex-col justify-end gap-1 w-full">
                             <div className="w-full bg-white/5 flex-1 rounded-t-sm relative overflow-hidden">
